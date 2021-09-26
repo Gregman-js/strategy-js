@@ -1,0 +1,28 @@
+.main .main-game {
+}
+
+.main .main-panel {
+    font-family: 'Permanent Marker', cursive;
+    background-image: url("img/bg-panel.png");
+}
+.main-panel-header {
+    background-color: #662919;
+}
+
+.main-panel-inventory .main-panel-inventory-item {
+    aspect-ratio: 1 / 1;
+    border: 2px solid #707070;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+}
+.main-panel-inventory .main-panel-inventory-item.item-draggable {
+    cursor: grab;
+}
+
+.main-panel-inventory .main-panel-inventory-item .main-panel-inventory-item-count {
+    position: absolute;
+    bottom: 0;
+    right: 8px;
+    pointer-events: none;
+}
