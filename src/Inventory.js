@@ -1,14 +1,16 @@
 import {$, $$} from './Utils.js';
 import Texture from "./Texture.js";
+import StructurePrice from "./StructurePrice.js";
 
 export default class Inventory {
     static inventoryX = 6;
     static inventoryY = 7;
     static resources = {
-        'wood': 0,
-        'stone': 0,
+        'wood': 50,
+        'stone': 50,
         'money': 0,
     };
+    static game = null;
 
     static init() {
         const inventoryWrapper = $('.main-panel-inventory');
@@ -23,17 +25,7 @@ export default class Inventory {
         }
         inventoryWrapper.append(row);
 
-        const resourceWrapper = $('.main-panel-resources-items-wrapper');
-
-        for (const name in Inventory.resources) {
-            const item = document.createElement('div');
-            item.classList.add('main-panel-resources-item');
-            item.classList.add('text-secondary');
-            item.dataset.resourceName = name;
-            const capitalized = name.charAt(0).toUpperCase() + name.slice(1);
-            item.innerHTML = capitalized + ': ' + '<span class="value text-white">0</span>';
-            resourceWrapper.append(item);
-        }
+        Inventory.updateResources();
     }
 
     static item() {
@@ -47,25 +39,47 @@ export default class Inventory {
 
     static loadInitialStructures(initialInventory) {
         const inventoryItems = $$('.main-panel-inventory-item');
-        for (const item of inventoryItems) {
-            let itemInside = false;
-            for (const field in initialInventory) {
-                if (initialInventory[field] > 0 && !itemInside) {
-                    const img = document.createElement('img');
-                    img.classList.add('w-100');
-                    img.src = Texture.getTextureUrl(field);
-                    item.dataset.field = field;
-                    item.innerHTML += '<div class="main-panel-inventory-item-count">' + initialInventory[field] + '</div>';
-                    initialInventory[field] = 0;
-                    item.classList.add('item-draggable');
-                    img.draggable = true;
-                    img.addEventListener("dragstart", ev => {
-                        ev.dataTransfer.setData("text/plain", field);
-                    });
-                    item.append(img);
-                    itemInside = true;
+        for (let i = 0; i < initialInventory.length; i++) {
+            const field = initialInventory[i];
+            const item = inventoryItems[i];
+            const img = document.createElement('img');
+            img.classList.add('w-100');
+            img.style.pointerEvents = 'none';
+            img.src = Texture.getTextureUrl(field);
+            item.dataset.field = field;
+            item.classList.add('item-clickable');
+            item.addEventListener("click", ev => {
+                if (StructurePrice.canBuy(field, Inventory.resources)) {
+                    Inventory.game.toggleAddStructureMode(field);
+                } else {
+                    alert('Can\'t buy');
                 }
-            }
+            });
+            item.dataset.toggle = 'tooltip';
+            item.dataset.placement = 'top';
+            item.title = StructurePrice.serialize(field);
+            new bootstrap.Tooltip(item)
+            item.append(img);
+        }
+    }
+
+    static decreaseResourcesFromField(field) {
+        Inventory.resources = StructurePrice.decreaseBy(Inventory.resources, field);
+        Inventory.updateResources();
+    }
+
+    static updateResources() {
+        const resourceWrapper = $('.main-panel-resources-items-wrapper');
+        resourceWrapper.innerHTML = '';
+
+        for (const name in Inventory.resources) {
+            const item = document.createElement('div');
+            item.classList.add('main-panel-resources-item');
+            item.classList.add('text-secondary');
+            item.dataset.resourceName = name;
+            const capitalized = name.charAt(0).toUpperCase() + name.slice(1);
+            item.innerHTML = capitalized + ': ' + '<span class="value text-white">' + Inventory.resources[name] + '</span>';
+            resourceWrapper.append(item);
         }
     }
 
@@ -80,7 +94,7 @@ export default class Inventory {
         countItem.innerText = newCount;
         if (newCount <= 0) {
             fieldItem.querySelector('img').draggable = false;
-            fieldItem.classList.remove('item-draggable');
+            fieldItem.classList.remove('item-clickable');
         }
     }
 

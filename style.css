@@ -16,8 +16,8 @@
     background-repeat: no-repeat;
     position: relative;
 }
-.main-panel-inventory .main-panel-inventory-item.item-draggable {
-    cursor: grab;
+.main-panel-inventory .main-panel-inventory-item.item-clickable {
+    cursor: pointer;
 }
 
 .main-panel-inventory .main-panel-inventory-item .main-panel-inventory-item-count {

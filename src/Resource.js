@@ -29,6 +29,7 @@ export default class Resource {
         }
 
         ctx.fillStyle = this.color;
+        ctx.strokeStyle = 'rgb(14,14,14)';
         ctx.lineWidth = 1;
         const proc = ((performance.now() - this.startTime) / 1000) / this.time;
         ctx.fillRect(

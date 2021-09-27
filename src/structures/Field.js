@@ -10,12 +10,23 @@ export default class Field {
     name;
     drawReact = false;
     resource = null;
+    renderStructure = true;
 
     constructor(x, y, ctx) {
         this.x = x;
         this.y = y;
         this.ctx = ctx;
         this.name = null;
+    }
+
+    moveTo(pos) {
+        this.x = pos[0] / Terrain.UNIT_SIZE;
+        this.y = pos[1] / Terrain.UNIT_SIZE;
+    }
+
+    normalizePos() {
+        this.x = Math.floor(this.x);
+        this.y = Math.floor(this.y);
     }
 
     update() {
@@ -25,6 +36,9 @@ export default class Field {
     }
 
     render() {
+        if (!this.renderStructure) {
+            return;
+        }
         this.ctx.drawImage(
             Texture.getTexture(this.name),
             this.x * Terrain.UNIT_SIZE,
